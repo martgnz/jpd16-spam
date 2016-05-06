@@ -14,3 +14,4 @@ Haremos un mapa de universitarios por barrios en Madrid ([demo](http://bl.ocks.o
 - Excel/OpenOffice
 - [QGIS](http://www.qgis.org/en/site/)
 - [TopoJSON](https://github.com/mbostock/topojson) ([Node.js](https://nodejs.org))
+- [Editor de código](https://atom.io)
