@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="utf-8" /> 
+<style>
+body {
+    max-width: 960px;
+    position: relative;
+}
+.legend {
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 12px;
+    display: table;
+    margin: 0 auto;
+    height: 35px;
+    width: 250px;
+}
+</style>
+
+<body>
+<script src="d3.min.js"></script>
+<script src="topojson.min.js"></script>
+<script src="rbush.min.js"></script>
+<script src="d3-legend.min.js"></script>
+<script src="spam.min.js"></script>
+
+<script type='text/javascript'>
+// escala
+var color = d3.scale.linear()
+    .domain([0.022, 0.067, 0.11, 0.17, 0.24])
+    .range(["#ca0020", "#f4a582", "#f7f7f7", "#92c5de", "#0571b0"])
+
+d3.select("body").append("svg")
+    .attr("class", "legend")
+
+//  leyenda
+var legend = d3.legend.color()
+    .shapeHeight(10)
+    .shapeWidth(50)
+    .shapePadding(0)
+    .labelOffset(5)
+    .labelFormat(d3.format("%"))
+    .orient("horizontal")
+    .labelAlign("start")
+    .scale(color)
+
+d3.select(".legend")
+    .call(legend)
+
+// abrir TopoJSON
+d3.json("madrid.json", function(error, d) {
+    topojson.presimplify(d)
+
+    // Spam
+    var map = new StaticCanvasMap({
+        element: "body",
+        projection: d3.geo.mercator()
+            .center([-3.7063242,40.5066516]) 
+            .scale(80000),
+        height: 620,
+        data: [{
+                features: topojson.feature(d, d.objects["madrid"]),
+                static: {
+                    paintfeature: function(parameters, d) {
+                        // pintar el mapa
+                        parameters.context.fillStyle = color(d.properties.rate)
+                        parameters.context.fill()
+
+                        parameters.context.lineWidth = 0.5
+                        parameters.context.strokeStyle = 'rgba(0,0,0,0.2)'
+                        parameters.context.stroke()
+                    }
+                }
+            }
+        ]
+    })
+    map.init()
+})
+</script>
