@@ -6,12 +6,15 @@ body {
     position: relative;
 }
 .legend {
-    font-family: "Helvetica Neue", sans-serif;
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-family: "Helvetica Neue",sans-serif;
     font-size: 12px;
-    display: table;
-    margin: 0 auto;
-    height: 35px;
-    width: 250px;
+    display: block;
+    padding: 10px;
+    height: 65px;
+    width: 100px;
 }
 </style>
 
@@ -24,30 +27,37 @@ body {
 
 <script type='text/javascript'>
 // escala
-var color = d3.scale.linear()
-    .domain([0.022, 0.067, 0.11, 0.17, 0.24])
+var color = d3.scale.quantile()
     .range(["#ca0020", "#f4a582", "#f7f7f7", "#92c5de", "#0571b0"])
 
+//  leyenda
 d3.select("body").append("svg")
     .attr("class", "legend")
 
-//  leyenda
 var legend = d3.legend.color()
     .shapeHeight(10)
-    .shapeWidth(50)
-    .shapePadding(0)
+    .shapeWidth(30)
+    .shapePadding(10)
     .labelOffset(5)
     .labelFormat(d3.format("%"))
-    .orient("horizontal")
+    .orient("vertical")
     .labelAlign("start")
-    .scale(color)
-
-d3.select(".legend")
-    .call(legend)
 
 // abrir TopoJSON
 d3.json("madrid.json", function(error, d) {
     topojson.presimplify(d)
+
+    // calcular máximo y mínimo 
+    color.domain(d3.extent(d.objects["madrid"].geometries, function(d) {
+        return d.properties.rate
+    }))
+
+    // pasar la escala a la leyenda
+    legend.scale(color)
+
+    // llamar a la leyenda
+    d3.select(".legend")
+        .call(legend)
 
     // Spam
     var map = new StaticCanvasMap({
